@@ -41,7 +41,7 @@ public class MessageSendProgramClient {
 
 			Channel channel = bootstrap.connect(tempIP, port).sync().channel();
 			
-			channel.close().sync();
+			channel.closeFuture().sync();
 		} 
 		catch (Exception e) {
 			e.printStackTrace();
