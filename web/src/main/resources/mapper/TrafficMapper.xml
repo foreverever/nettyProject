@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="traffic">
+
+	<select id="search" parameterType="hashmap" resultType="Traffic">
+		SELECT * FROM traffic <![CDATA[WHERE endTime >= #{start} and endTime <= #{end}]]> limit 1000
+	</select>
+	
+	<select id="rank" resultType="Ranking">
+		SELECT * FROM ranking ORDER BY cnt DESC;
+	</select>
+
+	<update id="updateRank">
+		UPDATE ranking AS T1, (SELECT content, COUNT(*) AS
+		cnt FROM traffic GROUP BY content) AS T2
+		SET T1.cnt = T2.cnt
+		WHERE T1.content = T2.content
+	</update>
+
+	<select id="time" resultType="Time">
+		select * from timeh
+	</select>
+	
+	<update id="resetTime">
+		update timeh set cnt = 0 <![CDATA[where num <= 24]]>
+	</update>
+	
+	<update id="updateTime">
+		UPDATE timeh AS T1, (select time_h as clock, COUNT(*) as
+		cnt FROM (SELECT DATE_FORMAT(endTime, '%H') AS time_h
+		FROM traffic <![CDATA[WHERE endTime >= curdate() and endTime < adddate(CURDATE(), 1)]]>)tmp
+		GROUP BY time_h) AS T2
+		SET T1.cnt = T2.cnt
+		WHERE T1.clock = T2.clock
+	</update>
+
+</mapper>
