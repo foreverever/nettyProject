@@ -18,6 +18,8 @@ public class RedisScheduler {
 
     Logger logger = LoggerFactory.getLogger(this.getClass());
 
+    private static final String MESSAGE_KEY = "messages";
+
     @Autowired
     private MessageService messageService;
 
@@ -26,7 +28,7 @@ public class RedisScheduler {
         long start = System.currentTimeMillis();
         logger.debug("스케줄러 작동!!!!");
 
-        List<Message> messages = messageService.range("messages", 0, messageService.size("messages"));
+        List<Message> messages = messageService.range(MESSAGE_KEY, 0, messageService.size(MESSAGE_KEY));
         messages.sort((Message a, Message b) -> a.getStartTime().compareTo(b.getStartTime()));
 
         messageService.saveAll(messages);
@@ -38,7 +40,7 @@ public class RedisScheduler {
 
     private void deleteRedisData(int size) {
         while (size > 0) {
-            messageService.leftPop("messages");
+            messageService.leftPop(MESSAGE_KEY);
             size--;
         }
     }
